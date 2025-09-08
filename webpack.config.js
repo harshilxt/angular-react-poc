@@ -1,7 +1,11 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports = (env, argv) => {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default (env, argv) => {
   const isProduction = argv.mode === 'production';
 
   return {
@@ -18,20 +22,16 @@ module.exports = (env, argv) => {
         {
           test: /\.(js|jsx|ts|tsx)$/,
           exclude: /node_modules/,
-          use: [
-            {
-              loader: 'babel-loader',
-              options: {
-                presets: ['@babel/preset-env', '@babel/preset-react'],
-              },
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                '@babel/preset-env',
+                ['@babel/preset-react', { runtime: 'automatic' }],
+                '@babel/preset-typescript'
+              ],
             },
-            {
-              loader: 'ts-loader',
-              options: {
-                transpileOnly: true,
-              },
-            },
-          ],
+          },
         },
         {
           test: /\.css$/,
