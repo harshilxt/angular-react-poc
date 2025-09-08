@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React ProductCard Web Component - Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    border: "var(--border)",
+                    ring: "var(--ring)",
+                },
+                fontFamily: {
+                    sans: ["var(--font-sans)"],
+                }
+            },
+        }
+    };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: hsl(0 0% 100%);
+            --foreground: hsl(222.2 84% 4.9%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(222.2 84% 4.9%);
+            --primary: hsl(221.2 83.2% 53.3%);
+            --primary-foreground: hsl(210 40% 98%);
+            --secondary: hsl(210 40% 96%);
+            --secondary-foreground: hsl(222.2 47.4% 11.2%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(215.4 16.3% 46.9%);
+            --accent: hsl(210 40% 96%);
+            --accent-foreground: hsl(222.2 47.4% 11.2%);
+            --border: hsl(214.3 31.8% 91.4%);
+            --ring: hsl(221.2 83.2% 53.3%);
+            --radius: 0.5rem;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .dark {
+            --background: hsl(222.2 84% 4.9%);
+            --foreground: hsl(210 40% 98%);
+            --card: hsl(222.2 84% 4.9%);
+            --card-foreground: hsl(210 40% 98%);
+            --primary: hsl(217.2 91.2% 59.8%);
+            --primary-foreground: hsl(222.2 84% 4.9%);
+            --secondary: hsl(217.2 32.6% 17.5%);
+            --secondary-foreground: hsl(210 40% 98%);
+            --muted: hsl(217.2 32.6% 17.5%);
+            --muted-foreground: hsl(215 20.2% 65.1%);
+            --accent: hsl(217.2 32.6% 17.5%);
+            --accent-foreground: hsl(210 40% 98%);
+            --border: hsl(217.2 32.6% 17.5%);
+            --ring: hsl(224.3 76.3% 94.1%);
+        }
+
+        body {
+            font-family: var(--font-sans);
+        }
+
+        .product-card {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .error-state {
+            background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+            border: 1px solid #fecaca;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-single-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .tablet-two-column {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .desktop-four-column {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground min-h-screen">
+    <!-- @COMPONENT: AppHeader -->
+    <header class="bg-card border-b border-border">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-foreground">React ProductCard Web Component</h1>
+                    <p class="text-muted-foreground mt-2">Cross-framework reusable component for Angular integration</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="px-3 py-1 text-xs font-medium bg-primary text-primary-foreground rounded-full">
+                        v1.0.0
+                    </span>
+                    <button class="px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-accent transition-colors">
+                        View Docs
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: AppHeader -->
+
+    <!-- @COMPONENT: IntegrationGuide -->
+    <section class="bg-muted py-8">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl font-semibold mb-4">Integration Example</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-card p-6 rounded-lg border border-border">
+                        <h3 class="text-lg font-medium mb-3 flex items-center">
+                            <span class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold mr-2">1</span>
+                            Angular Integration
+                        </h3>
+                        <div class="bg-slate-900 text-green-400 p-4 rounded-md text-sm font-mono overflow-x-auto">
+                            <div class="text-gray-400">// Import the web component</div>
+                            <div>import './product-card-standalone.js';</div>
+                            <br>
+                            <div class="text-gray-400">// Use in template</div>
+                            <div>&lt;product-card&gt;&lt;/product-card&gt;</div>
+                        </div>
+                    </div>
+                    <div class="bg-card p-6 rounded-lg border border-border">
+                        <h3 class="text-lg font-medium mb-3 flex items-center">
+                            <span class="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs font-bold mr-2">2</span>
+                            Build Output
+                        </h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center text-muted-foreground">
+                                <span class="w-4 h-4 mr-2">📁</span>
+                                <span>/dist/product-card-standalone.js</span>
+                            </div>
+                            <div class="flex items-center text-muted-foreground">
+                                <span class="w-4 h-4 mr-2">📁</span>
+                                <span>/dist/index.html</span>
+                            </div>
+                            <div class="flex items-center text-muted-foreground">
+                                <span class="w-4 h-4 mr-2">📦</span>
+                                <span>Ready for CDN deployment</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: IntegrationGuide -->
+
+    <!-- @COMPONENT: LiveDemo -->
+    <main class="container mx-auto px-4 py-12">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">Live Demo</h2>
+            <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Below is the ProductCard web component in action, fetching data from the API endpoint
+            </p>
+            <div class="mt-4 inline-flex items-center px-4 py-2 bg-accent text-accent-foreground rounded-full text-sm">
+                <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                API: /api/products
+            </div>
+        </div>
+
+        <!-- Loading State Demo -->
+        <div id="loading-demo" class="mb-8">
+            <h3 class="text-xl font-semibold mb-4">Loading State</h3>
+            <div class="grid gap-6 mobile-single-column tablet-two-column desktop-four-column">
+                <!-- @MAP: Array(4).fill().map((_, index) => ( -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden">
+                    <div class="loading-skeleton h-48 w-full"></div>
+                    <div class="p-4">
+                        <div class="loading-skeleton h-4 w-3/4 mb-2 rounded"></div>
+                        <div class="loading-skeleton h-4 w-1/2 rounded"></div>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden">
+                    <div class="loading-skeleton h-48 w-full"></div>
+                    <div class="p-4">
+                        <div class="loading-skeleton h-4 w-3/4 mb-2 rounded"></div>
+                        <div class="loading-skeleton h-4 w-1/2 rounded"></div>
+                    </div>
+                </div>
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden">
+                    <div class="loading-skeleton h-48 w-full"></div>
+                    <div class="p-4">
+                        <div class="loading-skeleton h-4 w-3/4 mb-2 rounded"></div>
+                        <div class="loading-skeleton h-4 w-1/2 rounded"></div>
+                    </div>
+                </div>
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden">
+                    <div class="loading-skeleton h-48 w-full"></div>
+                    <div class="p-4">
+                        <div class="loading-skeleton h-4 w-3/4 mb-2 rounded"></div>
+                        <div class="loading-skeleton h-4 w-1/2 rounded"></div>
+                    </div>
+                </div>
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden">
+                    <div class="loading-skeleton h-48 w-full"></div>
+                    <div class="p-4">
+                        <div class="loading-skeleton h-4 w-3/4 mb-2 rounded"></div>
+                        <div class="loading-skeleton h-4 w-1/2 rounded"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loaded State Demo -->
+        <div id="products-demo" class="mb-8" style="display: none;">
+            <h3 class="text-xl font-semibold mb-4">Loaded Products</h3>
+            <div class="grid gap-6 mobile-single-column tablet-two-column desktop-four-column">
+                <!-- @MAP: products.map(product => ( -->
+                <!-- Mock Product 1: Wireless Headphones -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <!-- Modern wireless headphones in sleek black design -->
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                         alt="Wireless Headphones" 
+                         class="w-full h-48 object-cover" 
+                         data-mock-image="true" />
+                    <div class="p-4">
+                        <h3 class="font-semibold text-card-foreground mb-2" data-bind="product.name">Wireless Headphones</h3>
+                        <p class="text-2xl font-bold text-primary" data-bind="product.price">$299.99</p>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="text-sm text-muted-foreground">In Stock</span>
+                            <button class="px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/90 transition-colors" 
+                                    data-event="click:handleAddToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mock Product 2: Smart Watch -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <!-- Modern smartwatch with digital display and sport band -->
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                         alt="Smart Watch" 
+                         class="w-full h-48 object-cover" 
+                         data-mock-image="true" />
+                    <div class="p-4">
+                        <h3 class="font-semibold text-card-foreground mb-2" data-bind="product.name">Smart Watch</h3>
+                        <p class="text-2xl font-bold text-primary" data-bind="product.price">$199.99</p>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="text-sm text-muted-foreground">In Stock</span>
+                            <button class="px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/90 transition-colors" 
+                                    data-event="click:handleAddToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mock Product 3: Laptop -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <!-- Modern laptop computer on clean white background -->
+                    <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                         alt="Laptop Computer" 
+                         class="w-full h-48 object-cover" 
+                         data-mock-image="true" />
+                    <div class="p-4">
+                        <h3 class="font-semibold text-card-foreground mb-2" data-bind="product.name">MacBook Pro</h3>
+                        <p class="text-2xl font-bold text-primary" data-bind="product.price">$1,299.99</p>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="text-sm text-muted-foreground">In Stock</span>
+                            <button class="px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/90 transition-colors" 
+                                    data-event="click:handleAddToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mock Product 4: Smartphone -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <!-- Modern smartphone with large display and sleek design -->
+                    <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                         alt="Smartphone" 
+                         class="w-full h-48 object-cover" 
+                         data-mock-image="true" />
+                    <div class="p-4">
+                        <h3 class="font-semibold text-card-foreground mb-2" data-bind="product.name">iPhone 15 Pro</h3>
+                        <p class="text-2xl font-bold text-primary" data-bind="product.price">$999.99</p>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="text-sm text-muted-foreground">In Stock</span>
+                            <button class="px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/90 transition-colors" 
+                                    data-event="click:handleAddToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mock Product 5: Wireless Mouse -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <!-- Modern wireless computer mouse in minimalist design -->
+                    <img src="https://images.unsplash.com/photo-1527814050087-3793815479db?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                         alt="Wireless Mouse" 
+                         class="w-full h-48 object-cover" 
+                         data-mock-image="true" />
+                    <div class="p-4">
+                        <h3 class="font-semibold text-card-foreground mb-2" data-bind="product.name">Wireless Mouse</h3>
+                        <p class="text-2xl font-bold text-primary" data-bind="product.price">$79.99</p>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="text-sm text-muted-foreground">In Stock</span>
+                            <button class="px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/90 transition-colors" 
+                                    data-event="click:handleAddToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mock Product 6: Keyboard -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <!-- Mechanical gaming keyboard with RGB backlighting -->
+                    <img src="https://images.unsplash.com/photo-1541140532154-b024d705b90a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                         alt="Mechanical Keyboard" 
+                         class="w-full h-48 object-cover" 
+                         data-mock-image="true" />
+                    <div class="p-4">
+                        <h3 class="font-semibold text-card-foreground mb-2" data-bind="product.name">Mechanical Keyboard</h3>
+                        <p class="text-2xl font-bold text-primary" data-bind="product.price">$149.99</p>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="text-sm text-muted-foreground">In Stock</span>
+                            <button class="px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/90 transition-colors" 
+                                    data-event="click:handleAddToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mock Product 7: Tablet -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <!-- Modern tablet with stylus pen on clean surface -->
+                    <img src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                         alt="Tablet Computer" 
+                         class="w-full h-48 object-cover" 
+                         data-mock-image="true" />
+                    <div class="p-4">
+                        <h3 class="font-semibold text-card-foreground mb-2" data-bind="product.name">iPad Pro</h3>
+                        <p class="text-2xl font-bold text-primary" data-bind="product.price">$799.99</p>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="text-sm text-muted-foreground">In Stock</span>
+                            <button class="px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/90 transition-colors" 
+                                    data-event="click:handleAddToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mock Product 8: Gaming Controller -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <!-- Modern gaming controller in black with colorful buttons -->
+                    <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                         alt="Gaming Controller" 
+                         class="w-full h-48 object-cover" 
+                         data-mock-image="true" />
+                    <div class="p-4">
+                        <h3 class="font-semibold text-card-foreground mb-2" data-bind="product.name">Gaming Controller</h3>
+                        <p class="text-2xl font-bold text-primary" data-bind="product.price">$59.99</p>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="text-sm text-muted-foreground">In Stock</span>
+                            <button class="px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/90 transition-colors" 
+                                    data-event="click:handleAddToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+        </div>
+
+        <!-- Error State Demo -->
+        <div id="error-demo" class="mb-8" style="display: none;">
+            <h3 class="text-xl font-semibold mb-4">Error State</h3>
+            <div class="error-state rounded-lg p-8 text-center">
+                <div class="w-16 h-16 mx-auto mb-4 text-red-500">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-red-800 mb-2">Failed to load products</h3>
+                <p class="text-red-600 mb-4">Unable to connect to the API endpoint. Please check your connection and try again.</p>
+                <button class="px-4 py-2 bg-red-100 text-red-800 rounded-md hover:bg-red-200 transition-colors" 
+                        data-event="click:handleRetry">
+                    Retry
+                </button>
+            </div>
+        </div>
+
+        <!-- Demo Controls -->
+        <div class="flex justify-center space-x-4 mt-8">
+            <button id="show-loading" class="px-6 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-accent transition-colors">
+                Show Loading
+            </button>
+            <button id="show-products" class="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+                Show Products
+            </button>
+            <button id="show-error" class="px-6 py-2 bg-red-100 text-red-800 rounded-md hover:bg-red-200 transition-colors">
+                Show Error
+            </button>
+        </div>
+    </main>
+    <!-- @END_COMPONENT: LiveDemo -->
+
+    <!-- @COMPONENT: TechnicalSpecs -->
+    <section class="bg-muted py-12">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold mb-8 text-center">Technical Specifications</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-card p-6 rounded-lg border border-border">
+                        <h3 class="font-semibold mb-3 flex items-center">
+                            <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mr-3">
+                                ⚛️
+                            </span>
+                            React Component
+                        </h3>
+                        <ul class="text-sm text-muted-foreground space-y-1">
+                            <li>• Functional component with hooks</li>
+                            <li>• Fetch API for data loading</li>
+                            <li>• Error boundary handling</li>
+                            <li>• Responsive design</li>
+                        </ul>
+                    </div>
+                    <div class="bg-card p-6 rounded-lg border border-border">
+                        <h3 class="font-semibold mb-3 flex items-center">
+                            <span class="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center mr-3">
+                                📦
+                            </span>
+                            Build System
+                        </h3>
+                        <ul class="text-sm text-muted-foreground space-y-1">
+                            <li>• Webpack bundling</li>
+                            <li>• Babel transpilation</li>
+                            <li>• Web Components API</li>
+                            <li>• Standalone distribution</li>
+                        </ul>
+                    </div>
+                    <div class="bg-card p-6 rounded-lg border border-border">
+                        <h3 class="font-semibold mb-3 flex items-center">
+                            <span class="w-8 h-8 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mr-3">
+                                🔗
+                            </span>
+                            Integration
+                        </h3>
+                        <ul class="text-sm text-muted-foreground space-y-1">
+                            <li>• Angular compatible</li>
+                            <li>• Custom element registration</li>
+                            <li>• Shadow DOM encapsulation</li>
+                            <li>• CDN ready deployment</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: TechnicalSpecs -->
+
+    <!-- @COMPONENT: Footer -->
+    <footer class="bg-card border-t border-border py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-muted-foreground">&copy; 2024 React ProductCard Web Component. Built with ⚛️ React & Webpack.</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-muted-foreground hover:text-foreground transition-colors">Documentation</a>
+                    <a href="#" class="text-muted-foreground hover:text-foreground transition-colors">GitHub</a>
+                    <a href="#" class="text-muted-foreground hover:text-foreground transition-colors">NPM</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- @END_COMPONENT: Footer -->
+
+    <script>
+        // Demo state management
+        (function() {
+            const loadingDemo = document.getElementById('loading-demo');
+            const productsDemo = document.getElementById('products-demo');
+            const errorDemo = document.getElementById('error-demo');
+            
+            const showLoadingBtn = document.getElementById('show-loading');
+            const showProductsBtn = document.getElementById('show-products');
+            const showErrorBtn = document.getElementById('show-error');
+
+            function hideAllDemos() {
+                loadingDemo.style.display = 'none';
+                productsDemo.style.display = 'none';
+                errorDemo.style.display = 'none';
+            }
+
+            showLoadingBtn.addEventListener('click', () => {
+                hideAllDemos();
+                loadingDemo.style.display = 'block';
+            });
+
+            showProductsBtn.addEventListener('click', () => {
+                hideAllDemos();
+                productsDemo.style.display = 'block';
+            });
+
+            showErrorBtn.addEventListener('click', () => {
+                hideAllDemos();
+                errorDemo.style.display = 'block';
+            });
+
+            // Simulate loading to products transition
+            setTimeout(() => {
+                hideAllDemos();
+                productsDemo.style.display = 'block';
+            }, 3000);
+
+            // TODO: Implement actual API integration
+            // TODO: Implement web component registration
+            // TODO: Implement React component with useState and useEffect
+            // TODO: Implement error boundary and retry logic
+            // TODO: Implement add to cart functionality
+        })();
+    </script>
+</body>
+</html>

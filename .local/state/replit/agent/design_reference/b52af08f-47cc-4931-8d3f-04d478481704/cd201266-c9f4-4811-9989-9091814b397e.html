@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Product Card Component - Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    borderRadius: {
+                        lg: "var(--radius)",
+                        md: "calc(var(--radius) - 2px)",
+                        sm: "calc(var(--radius) - 4px)",
+                    },
+                    colors: {
+                        background: "var(--background)",
+                        foreground: "var(--foreground)",
+                        card: {
+                            DEFAULT: "var(--card)",
+                            foreground: "var(--card-foreground)",
+                        },
+                        primary: {
+                            DEFAULT: "var(--primary)",
+                            foreground: "var(--primary-foreground)",
+                        },
+                        secondary: {
+                            DEFAULT: "var(--secondary)",
+                            foreground: "var(--secondary-foreground)",
+                        },
+                        muted: {
+                            DEFAULT: "var(--muted)",
+                            foreground: "var(--muted-foreground)",
+                        },
+                        accent: {
+                            DEFAULT: "var(--accent)",
+                            foreground: "var(--accent-foreground)",
+                        },
+                        border: "var(--border)",
+                        input: "var(--input)",
+                        ring: "var(--ring)",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "system-ui", "sans-serif"],
+                    }
+                },
+            }
+        };
+    </script>
+    <style>
+        :root {
+            --background: hsl(210 40% 98%);
+            --foreground: hsl(222.2 84% 4.9%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(222.2 84% 4.9%);
+            --primary: hsl(221.2 83.2% 53.3%);
+            --primary-foreground: hsl(210 40% 98%);
+            --secondary: hsl(210 40% 96%);
+            --secondary-foreground: hsl(222.2 84% 4.9%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(215.4 16.3% 46.9%);
+            --accent: hsl(210 40% 96%);
+            --accent-foreground: hsl(222.2 84% 4.9%);
+            --border: hsl(214.3 31.8% 91.4%);
+            --input: hsl(214.3 31.8% 91.4%);
+            --ring: hsl(221.2 83.2% 53.3%);
+            --radius: 0.75rem;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .product-card {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .error-state {
+            background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+            border: 1px solid #fecaca;
+        }
+    </style>
+</head>
+<body class="bg-background font-sans antialiased">
+    <!-- @COMPONENT: Header [Demo page header with title and description] -->
+    <header class="bg-card border-b border-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-foreground mb-2">React Product Card Component</h1>
+                <p class="text-muted-foreground text-lg mb-4">Reusable Web Component Demo</p>
+                <div class="flex justify-center items-center space-x-4 text-sm text-muted-foreground">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span>React 18</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <span>Web Components</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span>Webpack</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header -->
+
+    <!-- @COMPONENT: MainDemo [Main demo section with API status and product grid] -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- @COMPONENT: APIStatus [Shows current API connection status] -->
+        <div class="mb-8">
+            <div class="bg-card rounded-lg border border-border p-6">
+                <h2 class="text-xl font-semibold text-foreground mb-4">API Status</h2>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-foreground font-medium">Connected</span>
+                        <code class="text-sm bg-muted px-2 py-1 rounded text-muted-foreground" data-mock="true">
+                            https://13b25d97-e1b6-4387-8784-f994731917e9-00-om5kx3mzfcvd.worf.repl.co/api/products
+                        </code>
+                    </div>
+                    <div class="text-sm text-muted-foreground">
+                        <span data-bind="products.length" data-mock="true">6</span> products loaded
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: APIStatus -->
+
+        <!-- @COMPONENT: ProductGrid [Grid container for product cards] -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-foreground mb-6">Product Collection</h2>
+            
+            <!-- @STATE: loading:boolean = false, error:string = null, products:array = [] -->
+            
+            <!-- Loading State -->
+            <div class="hidden" data-state="loading">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- @MAP: Array(6).fill().map((_, index) => ( -->
+                    <div class="bg-card rounded-lg border border-border overflow-hidden">
+                        <div class="loading-shimmer h-48 w-full"></div>
+                        <div class="p-4">
+                            <div class="loading-shimmer h-4 w-3/4 mb-2 rounded"></div>
+                            <div class="loading-shimmer h-4 w-1/2 rounded"></div>
+                        </div>
+                    </div>
+                    <!-- @END_MAP )) -->
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div class="hidden error-state rounded-lg p-6 text-center" data-state="error">
+                <div class="text-red-600 mb-2">
+                    <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-red-800 mb-2">Failed to Load Products</h3>
+                <p class="text-red-600 mb-4" data-bind="error">Unable to connect to the API endpoint</p>
+                <button class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors" data-event="click:retryFetch">
+                    Retry Loading
+                </button>
+            </div>
+
+            <!-- Success State - Product Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-state="success">
+                <!-- @MAP: products.map(product => ( -->
+                
+                <!-- @COMPONENT: ProductCard [Individual product card with image, name, and price] -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <div class="relative">
+                        <!-- Modern smartphone with sleek design and advanced features -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                            alt="Premium Smartphone" 
+                            class="w-full h-48 object-cover" 
+                            data-bind="product.image"
+                        />
+                        <div class="absolute top-3 right-3">
+                            <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                In Stock
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-foreground text-lg mb-2" data-bind="product.name">
+                            Premium Smartphone Pro
+                        </h3>
+                        <p class="text-muted-foreground text-sm mb-3">
+                            Latest technology with advanced features and premium build quality
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-primary" data-bind="product.price">
+                                $999.99
+                            </span>
+                            <button class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors text-sm font-medium" data-event="click:addToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: ProductCard -->
+
+                <!-- @COMPONENT: ProductCard [Wireless headphones product] -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <div class="relative">
+                        <!-- High-quality wireless headphones with noise cancellation -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                            alt="Wireless Headphones" 
+                            class="w-full h-48 object-cover" 
+                            data-bind="product.image"
+                        />
+                        <div class="absolute top-3 right-3">
+                            <span class="bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                Limited
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-foreground text-lg mb-2" data-bind="product.name">
+                            Wireless Headphones Pro
+                        </h3>
+                        <p class="text-muted-foreground text-sm mb-3">
+                            Premium audio experience with active noise cancellation
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-primary" data-bind="product.price">
+                                $299.99
+                            </span>
+                            <button class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors text-sm font-medium" data-event="click:addToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: ProductCard -->
+
+                <!-- @COMPONENT: ProductCard [Laptop computer product] -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <div class="relative">
+                        <!-- Sleek modern laptop computer with metallic finish -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                            alt="Professional Laptop" 
+                            class="w-full h-48 object-cover" 
+                            data-bind="product.image"
+                        />
+                        <div class="absolute top-3 right-3">
+                            <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                In Stock
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-foreground text-lg mb-2" data-bind="product.name">
+                            Professional Laptop Ultra
+                        </h3>
+                        <p class="text-muted-foreground text-sm mb-3">
+                            High-performance laptop for professional workloads
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-primary" data-bind="product.price">
+                                $1,499.99
+                            </span>
+                            <button class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors text-sm font-medium" data-event="click:addToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: ProductCard -->
+
+                <!-- @COMPONENT: ProductCard [Smart watch product] -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <div class="relative">
+                        <!-- Modern smartwatch with digital display and fitness tracking -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                            alt="Smart Watch" 
+                            class="w-full h-48 object-cover" 
+                            data-bind="product.image"
+                        />
+                        <div class="absolute top-3 right-3">
+                            <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                In Stock
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-foreground text-lg mb-2" data-bind="product.name">
+                            Smart Watch Series X
+                        </h3>
+                        <p class="text-muted-foreground text-sm mb-3">
+                            Advanced fitness tracking and smart notifications
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-primary" data-bind="product.price">
+                                $399.99
+                            </span>
+                            <button class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors text-sm font-medium" data-event="click:addToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: ProductCard -->
+
+                <!-- @COMPONENT: ProductCard [Gaming console product] -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <div class="relative">
+                        <!-- Modern gaming console with controllers and accessories -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                            alt="Gaming Console" 
+                            class="w-full h-48 object-cover" 
+                            data-bind="product.image"
+                        />
+                        <div class="absolute top-3 right-3">
+                            <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                Pre-order
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-foreground text-lg mb-2" data-bind="product.name">
+                            Gaming Console Next-Gen
+                        </h3>
+                        <p class="text-muted-foreground text-sm mb-3">
+                            Ultimate gaming experience with 4K graphics
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-primary" data-bind="product.price">
+                                $599.99
+                            </span>
+                            <button class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors text-sm font-medium" data-event="click:addToCart">
+                                Pre-order
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: ProductCard -->
+
+                <!-- @COMPONENT: ProductCard [Wireless earbuds product] -->
+                <div class="product-card bg-card rounded-lg border border-border overflow-hidden shadow-sm" data-mock="true">
+                    <div class="relative">
+                        <!-- Compact wireless earbuds in charging case -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                            alt="Wireless Earbuds" 
+                            class="w-full h-48 object-cover" 
+                            data-bind="product.image"
+                        />
+                        <div class="absolute top-3 right-3">
+                            <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                In Stock
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-foreground text-lg mb-2" data-bind="product.name">
+                            Wireless Earbuds Pro
+                        </h3>
+                        <p class="text-muted-foreground text-sm mb-3">
+                            True wireless audio with premium sound quality
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-primary" data-bind="product.price">
+                                $179.99
+                            </span>
+                            <button class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors text-sm font-medium" data-event="click:addToCart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: ProductCard -->
+
+                <!-- @END_MAP )) -->
+            </div>
+        </div>
+        <!-- @END_COMPONENT: ProductGrid -->
+
+        <!-- @COMPONENT: TechnicalInfo [Technical implementation details] -->
+        <div class="bg-card rounded-lg border border-border p-6">
+            <h2 class="text-xl font-semibold text-foreground mb-4">Implementation Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-medium text-foreground mb-2">Web Component Usage</h3>
+                    <div class="bg-muted rounded-lg p-4">
+                        <code class="text-sm text-muted-foreground">
+                            &lt;product-card&gt;&lt;/product-card&gt;
+                        </code>
+                    </div>
+                    <p class="text-sm text-muted-foreground mt-2">
+                        Custom element automatically registers and fetches products from the API
+                    </p>
+                </div>
+                <div>
+                    <h3 class="font-medium text-foreground mb-2">Angular Integration</h3>
+                    <div class="bg-muted rounded-lg p-4">
+                        <code class="text-sm text-muted-foreground">
+                            import './product-card-standalone.js'
+                        </code>
+                    </div>
+                    <p class="text-sm text-muted-foreground mt-2">
+                        Import the standalone build to use in any Angular project
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <h3 class="font-medium text-foreground mb-3">Build Outputs</h3>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between py-2 px-3 bg-muted rounded">
+                        <span class="text-sm font-mono text-muted-foreground">/dist/main.js</span>
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Regular Build</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2 px-3 bg-muted rounded">
+                        <span class="text-sm font-mono text-muted-foreground">/src/standalone-builds/product-card-standalone.js</span>
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Web Component</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: TechnicalInfo -->
+    </main>
+    <!-- @END_COMPONENT: MainDemo -->
+
+    <!-- @COMPONENT: Footer [Simple footer with project information] -->
+    <footer class="bg-card border-t border-border mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p class="text-muted-foreground text-sm">
+                    React Product Card Component Demo • Built with React 18, Webpack, and Web Components
+                </p>
+                <div class="flex justify-center items-center space-x-4 mt-4 text-xs text-muted-foreground">
+                    <span>Project: REACTPRODUCTSAPP</span>
+                    <span>•</span>
+                    <span>Cross-Framework Compatible</span>
+                    <span>•</span>
+                    <span>Reusable Component</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- @END_COMPONENT: Footer -->
+
+    <script>
+        // TODO: Implement actual React component logic and web component registration
+        // TODO: Add real API integration with error handling and loading states  
+        // TODO: Implement product card interactions (add to cart, favorites, etc.)
+        // TODO: Add responsive behavior and accessibility features
+        
+        (function() {
+            // Simulate loading state toggle for demo purposes
+            const toggleLoadingState = () => {
+                const states = ['loading', 'success', 'error'];
+                const currentState = 'success'; // Default to success for demo
+                
+                states.forEach(state => {
+                    const elements = document.querySelectorAll(`[data-state="${state}"]`);
+                    elements.forEach(el => {
+                        el.classList.toggle('hidden', state !== currentState);
+                    });
+                });
+            };
+            
+            // Initialize demo state
+            toggleLoadingState();
+            
+            // Add hover effects and interactions
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Simulate add to cart functionality
+            const addToCartButtons = document.querySelectorAll('[data-event*="addToCart"]');
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const originalText = this.textContent;
+                    this.textContent = 'Added!';
+                    this.style.backgroundColor = '#10B981';
+                    
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                        this.style.backgroundColor = '';
+                    }, 1500);
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
