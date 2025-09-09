@@ -4,11 +4,11 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "start": "webpack serve --mode=development --config webpack.config.js --port 8080",
-    "start:mf": "webpack serve --mode=development --config webpack.config.js --port 8080",
-    "build": "webpack --mode=production --config webpack.config.js",
-    "build:mf": "webpack --mode=production --config webpack.config.js",
-    "dev": "webpack serve --mode=development --config webpack.config.js --port 8080",
+    "dev": "webpack serve --mode=development --config webpack.config.app.js --port 3000",
+    "start": "webpack serve --mode=development --config webpack.config.app.js --port 3000",
+    "build": "webpack --mode=production --config webpack.config.app.js",
+    "start:mf": "webpack serve --mode=development --config webpack.config.mf.js --port 8080",
+    "build:mf": "webpack --mode=production --config webpack.config.mf.js",
     "check": "tsc"
   },
   "dependencies": {
