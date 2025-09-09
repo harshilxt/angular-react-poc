@@ -10,7 +10,7 @@ export default (env, argv) => {
 
   return {
     mode: isProduction ? 'production' : 'development',
-    entry: './client/src/react-mf.js',
+    entry: './src/react-mf.js',
     output: {
       path: path.resolve(__dirname, 'dist-mf'),
       filename: 'react-mf.js',
@@ -42,7 +42,7 @@ export default (env, argv) => {
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       alias: {
-        '@': path.resolve(__dirname, 'client/src'),
+        '@': path.resolve(__dirname, 'src'),
       },
     },
     externals: ['react', 'react-dom'],
@@ -59,7 +59,7 @@ export default (env, argv) => {
     },
     plugins: [
       new HtmlWebpackPlugin({
-        template: './client/index.html',
+        template: './index.html',
         filename: 'index.html',
       }),
     ],
