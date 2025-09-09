@@ -45,11 +45,16 @@ export default (env, argv) => {
       },
     },
     devServer: {
-      port: 3000,
+      port: 5000,
+      host: '0.0.0.0',
+      allowedHosts: 'all',
       hot: true,
       historyApiFallback: true,
       static: {
         directory: path.join(__dirname, 'dist'),
+      },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
       },
     },
     plugins: [

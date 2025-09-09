@@ -48,6 +48,8 @@ export default (env, argv) => {
     externals: ['react', 'react-dom'],
     devServer: {
       port: 8080,
+      host: '0.0.0.0',
+      allowedHosts: 'all',
       hot: true,
       historyApiFallback: true,
       static: {
