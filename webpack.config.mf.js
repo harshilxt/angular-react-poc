@@ -10,6 +10,7 @@ export default (env, argv) => {
 
   return {
     mode: isProduction ? 'production' : 'development',
+    // devtool: isProduction ? 'source-map' : 'inline-source-map',
     entry: './src/react-mf.js',
     output: {
       path: path.resolve(__dirname, 'dist-mf'),
@@ -45,7 +46,7 @@ export default (env, argv) => {
         '@': path.resolve(__dirname, 'src'),
       },
     },
-    externals: ['react', 'react-dom'],
+    // externals: ['react', 'react-dom'],
     devServer: {
       port: 8080,
       host: '0.0.0.0',
